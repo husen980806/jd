@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        body,html{
+            width: 100%;
+        }
+        #box{
+            width: 60%;
+            margin: auto;
+            margin-top: 50px;
+        }
+        button{
+            background: skyblue;
+            color:white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+        }
+        table{
+            width: 100%;
+            text-align: center;
+            margin: 50px 0px;
+        }
+        .action{
+            background: yellow;
+        }
+        .white{
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+        添加：<input type="text" id="username" placeholder="姓名">
+              <input type="text" id="age" placeholder="年龄">
+              <button id="add">添加</button>
+              变色：<button id="yrbs">开启移入变色</button>
+              <table border="1" cellspacing="0">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>姓名</th>
+                          <th>年龄</th>
+                          <th>操作</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <!-- <tr>
+                          <td>1</td>
+                          <td>张三</td>
+                          <td>33</td>
+                          <td><a href="#">删除</a></td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>李四</td>
+                        <td>22</td>
+                        <td><a href="#">删除</a></td>
+                    </tr> -->
+                  </tbody>
+              </table>
+
+              搜索：<input type="text" id="search" placeholder="搜索">
+                    <button id="sou">搜索</button>
+                    <button id="reset">重置</button>
+              排序：<button class="sort">年龄从小到大排序</button>
+              
+
+    </div>  
+    <script src="./jquery-3.4.1.min.js"></script>
+    <script>
+        $(function(){
+            
+
+
+            function show(){
+                $.ajax({
+                    url:"http://127.0.0.1:3000/",
+                    type:"post",
+                   dataType:"json",
+                   data:{
+                       find:$("#search").val()
+                   },
+                   success:function(res){
+                   
+                       var str="";
+                       console.log(res);
+                       
+
+                    //    console.log(11)
+                       $.each(res,function(index,ele){
+                           str+="<tr class='a' pid='"+ele._id+"'>"
+                                +"<td>"+(index+1)+"</td>"
+                                +"<td>"+ele.username+"</td>"
+                                +"<td>"+ele.age+"</td>"
+                                +'<td><a href="#" class="del">删除</a></td>'
+                                +"</tr>"
+                       })
+                       $("tbody").html(str);
+                       
+                       del();
+                       move()
+
+                   }
+                })
+            }
+            show()
+            // 重置
+            $("#reset").click(function(){
+                $("#search").val("")
+                show()
+            })
+            
+            $("#sou").click(function(){
+                
+                show()
+                sort()
+                // console.log(111)
+            })
+            
+            $("#add").click(function(){
+                //console.log(111)
+                if($("#username").val()&&$("#age").val()!=0){
+                    $.ajax({
+                   url:"http://127.0.0.1:3000/show",
+                   type:"post",
+                   dataType:"json",
+                   data:{
+                       username:$("#username").val(),
+                       age:$("#age").val(),
+                   },
+                   success:function(res){
+                       console.log(res);
+                       show();
+                      
+                   }
+               }) 
+                }else{
+
+                    alert("123456");
+                }
+                  
+            
+            })
+
+
+
+            function del(){
+
+                $(".del").click(function(){
+
+                    var pid=$(this).parent().parent().attr("pid");
+               
+                $.ajax({
+                    url:"http://127.0.0.1:3000/del",
+                    type:"post",
+                    dataType:"json",
+                    data:{
+                        _id:pid
+                    },
+                    success:function(res){
+                        console.log(res);   
+                        show();
+                    }
+
+
+                })
+                })
+            }
+         function move(){
+
+            $("#yrbs").on("click",function(){
+                $.ajax({
+                    url:"http://127.0.0.1:3000/logo",
+                    type:"post",
+                    data:{
+                        action:$("#yrbs").html()
+                    },
+                    dataType:"json",
+                    success:function(res){
+                        if(res.success){
+                            console.log("标识成功")
+                        }
+                    }
+                })
+                if($(this).html()=="开启移入变色"){
+                    $(this).html("关闭移入变色")
+                   $(".a").hover(function(){
+                        $(this).addClass("action").siblings().removeClass("action")
+                   },function(){
+                    $(this).removeClass("action")
+                   })
+                   
+                }else if($(this).html()=="关闭移入变色"){
+                    $(this).html("开启移入变色")
+                    $(".a").off()
+                    // $("tr").addClass("white");
+                    // $(".a").css("pointer-events","none")
+                }
+
+            })
+
+         }
+         sort()
+        function sort(){
+
+         $(".sort").click(function(){
+             $.ajax({
+                 url:"http://127.0.0.1:3000/sort",
+                 type:"post",
+                 data:{
+                    find:$("#search").val()
+                 },
+                 dataType:'json',
+                 success:function(res){
+                    console.log(res)
+                    var str="";
+                       console.log(res);
+
+                       $.each(res,function(index,ele){
+                           str+="<tr class='a' pid='"+ele._id+"'>"
+                                +"<td>"+(index+1)+"</td>"
+                                +"<td>"+ele.username+"</td>"
+                                +"<td>"+ele.age+"</td>"
+                                +'<td><a href="#" class="del">删除</a></td>'
+                                +"</tr>"
+                       })
+                       $("tbody").html(str);
+                       
+                       del();
+                       move()
+                 }
+             })
+         })
+        }
+
+
+        })
+    </script>  
+</body>
+</html>
