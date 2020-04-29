@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <ul>
+       
+       
+    </ul>
+    <script src="jquery-3.4.1.min.js"></script>
+    <script>
+        //封装ajax
+      /*  function ajax(type,url,data,async,success) {
+            var xhr=null;
+            try {
+                xhr=new XMLHttpRequest();
+            } catch (e) {
+                xhr=new ActiveXObject("microsoft.XML");
+            }
+            if (type=="get"&&data) {
+                url+="?"+data;
+            }
+            xhr.open(type,url,async)
+            if (type=="post") {
+                
+            }
+
+
+
+
+        }*/
+
+        $.ajax({
+          type:"post",
+          url:"http://route.showapi.com/341-2",
+          dataType:"json",
+          data:{
+            showapi_appid:110266,
+            showapi_sign: "38d94d86c5ed48d8890948d480e4d274",
+        
+          },
+          success:function(result){
+          console.log(result);
+          alert(result.showapi_res_code);
+          var str="";
+          var arr=result.showapi_res_body.contentlist;
+          console.log(arr);
+          $.each(arr,function(index,ele){
+              str+='<li>'+ '<img src="'+arr[index].img+'">'
+                +'<p> '+arr[index].title+'</p></li>'
+          
+          })
+         $("ul").html(str);
+          }
+      })
+
+
+
+
+
+    </script>
+   
+</body>
+</html>
